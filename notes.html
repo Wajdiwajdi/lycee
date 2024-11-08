@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الملاحظات</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 2em;
+            margin-top: 20px;
+        }
+
+        .note-input {
+            width: 80%;
+            height: 100px;
+            padding: 10px;
+            font-size: 1em;
+            margin: 15px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .save-button {
+            padding: 10px 20px;
+            background-color: #e74c3c;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        .save-button:hover {
+            background-color: #c0392b;
+        }
+
+        .notes-list {
+            margin-top: 20px;
+            text-align: left;
+            color: #333;
+            font-size: 1.1em;
+            background-color: #ffffff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .note-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .delete-button {
+            background-color: #e74c3c;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .delete-button:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>صفحة تسجيل الملاحظات</h1>
+
+        <!-- نموذج لإدخال الملاحظة -->
+        <textarea id="noteInput" class="note-input" placeholder="اكتب ملاحظتك هنا..."></textarea>
+        <br>
+        <button onclick="saveNote()" class="save-button">حفظ الملاحظة</button>
+
+        <!-- قائمة لعرض الملاحظات المحفوظة -->
+        <div id="notesList" class="notes-list"></div>
+    </div>
+
+    <script>
+        // دالة لحفظ الملاحظة في LocalStorage
+        function saveNote() {
+            let noteInput = document.getElementById('noteInput').value;
+            if (noteInput) {
+                let notes = JSON.parse(localStorage.getItem('notes')) || [];
+                notes.push(noteInput);
+                localStorage.setItem('notes', JSON.stringify(notes));
+                document.getElementById('noteInput').value = '';
+                displayNotes();
+            } else {
+                alert("يرجى كتابة ملاحظة قبل الحفظ.");
+            }
+        }
+
+        // دالة لعرض الملاحظات من LocalStorage
+        function displayNotes() {
+            let notesList = document.getElementById('notesList');
+            let notes = JSON.parse(localStorage.getItem('notes')) || [];
+            notesList.innerHTML = '';
+
+            notes.forEach((note, index) => {
+                let noteItem = document.createElement('div');
+                noteItem.className = 'note-item';
+
+                // نص الملاحظة
+                let noteText = document.createElement('span');
+                noteText.textContent = note;
+
+                // زر الحذف
+                let deleteButton = document.createElement('button');
+                deleteButton.textContent = 'حذف';
+                deleteButton.className = 'delete-button';
+                deleteButton.onclick = function () {
+                    deleteNote(index);
+                };
+
+                noteItem.appendChild(noteText);
+                noteItem.appendChild(deleteButton);
+                notesList.appendChild(noteItem);
+            });
+        }
+
+        // دالة لحذف ملاحظة معينة بناءً على فهرسها
+        function deleteNote(index) {
+            let notes = JSON.parse(localStorage.getItem('notes')) || [];
+            notes.splice(index, 1);  // حذف الملاحظة من المصفوفة
+            localStorage.setItem('notes', JSON.stringify(notes));  // تحديث LocalStorage
+            displayNotes();  // تحديث العرض
+        }
+
+        // عرض الملاحظات عند تحميل الصفحة
+        window.onload = displayNotes;
+    </script>
+</body>
+</html>
